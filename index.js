@@ -20,6 +20,17 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
     console.log("connection err", err)
     const bookCollection = client.db("bookStore").collection("books");
+    const orderCollection = client.db("bookStore").collection("orders");
+    console.log("database connected");
+
+    app.post("/addBook", (req, res) => {
+        const newBook = req.body;
+        console.log("adding book: ", newBook)
+        bookCollection.insertOne(newBook)
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
+    })
 
     app.get("/books", (req, res) => {
         bookCollection.find()
@@ -28,19 +39,38 @@ client.connect(err => {
             })
     })
 
-    app.get("/books/:id", (req, res) => {
+    app.get("/book/:id", (req, res) => {
         bookCollection.find({ _id: ObjectID(req.params.id) })
             .toArray((err, items) => {
                 res.send(items[0]);
             })
     })
 
-    app.post("/addBook", (req, res) => {
-        const newBook = req.body;
-        console.log("adding book: ", newBook)
-        bookCollection.insertOne(newBook)
+    app.delete("/delete/:id", (req, rew) => {
+        console.log(req.params.id);
+        bookCollection.deleteOne({ _id: ObjectID(req.params.id) })
             .then(result => {
+                console.log(result);
+            })
+    })
+
+
+    app.post("/addOrder", (req, res) => {
+        const newOrder = req.body;
+        orderCollection.insertOne(newOrder)
+            .then(result => {
+                console.log(result);
                 res.send(result.insertedCount > 0)
+            })
+        console.log(newOrder);
+    })
+
+
+    app.get("/order", (req, res) => {
+        console.log(req.query.email);
+        orderCollection.find({ email: req.query.email })
+            .toArray((err, items) => {
+                res.send(items)
             })
     })
 });
