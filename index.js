@@ -21,11 +21,9 @@ client.connect(err => {
     console.log("connection err", err)
     const bookCollection = client.db("bookStore").collection("books");
     const orderCollection = client.db("bookStore").collection("orders");
-    console.log("database connected");
 
     app.post("/addBook", (req, res) => {
         const newBook = req.body;
-        console.log("adding book: ", newBook)
         bookCollection.insertOne(newBook)
             .then(result => {
                 res.send(result.insertedCount > 0)
@@ -46,11 +44,10 @@ client.connect(err => {
             })
     })
 
-    app.delete("/delete/:id", (req, rew) => {
+    app.delete("/delete/:id", (req, res) => {
         console.log(req.params.id);
         bookCollection.deleteOne({ _id: ObjectID(req.params.id) })
             .then(result => {
-                console.log(result);
             })
     })
 
@@ -62,13 +59,11 @@ client.connect(err => {
                 console.log(result);
                 res.send(result.insertedCount > 0)
             })
-        console.log(newOrder);
     })
 
-
     app.get("/order", (req, res) => {
-        console.log(req.query.email);
-        orderCollection.find({ email: req.query.email })
+        let email = req.query.email;
+        orderCollection.find({ email: email })
             .toArray((err, items) => {
                 res.send(items)
             })
