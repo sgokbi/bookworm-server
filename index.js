@@ -18,7 +18,6 @@ app.get('/', (req, res) => {
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.t3lkk.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
-    console.log("connection err", err)
     const bookCollection = client.db("bookStore").collection("books");
     const orderCollection = client.db("bookStore").collection("orders");
 
@@ -45,7 +44,6 @@ client.connect(err => {
     })
 
     app.delete("/delete/:id", (req, res) => {
-        console.log(req.params.id);
         bookCollection.deleteOne({ _id: ObjectID(req.params.id) })
             .then(result => {
             })
@@ -56,7 +54,6 @@ client.connect(err => {
         const newOrder = req.body;
         orderCollection.insertOne(newOrder)
             .then(result => {
-                console.log(result);
                 res.send(result.insertedCount > 0)
             })
     })
